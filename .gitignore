@@ -4,3 +4,5 @@ __pycache__/
 instance/
 *.pkl
 *.csv
+*.zip
+docs/instance.zip
