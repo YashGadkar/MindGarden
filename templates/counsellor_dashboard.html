@@ -1,0 +1,494 @@
+{% extends "layout.html" %}
+
+{% block title %}MindGarden - Counsellor Dashboard{% endblock %}
+
+{% block content %}
+<div class="hero-card">
+  <div>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+      <span style="background: rgba(234, 43, 43, 0.2); color: #f87171; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Clinical Control Center</span>
+      <span style="color: rgba(255,255,255,0.7); font-size: 13px;">Mental Health &amp; Intervention</span>
+    </div>
+    <h1>Counsellor Dashboard</h1>
+    <p style="color: #e2e8f0; font-size: 14px;">
+      Welcome, <strong>{{ user.name if user.name.startswith('Dr.') else 'Dr. ' + user.name }}</strong>. Review AI-flagged high risk streaks, coordinate scheduled consultations, and record diagnostic notes.
+    </p>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
+    <a href="#priority-queue" class="hero-pill-btn" style="background: rgba(239, 68, 68, 0.25); border-color: rgba(239, 68, 68, 0.4);">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>Priority Flags ({% if flagged %}{{ flagged|length }}{% else %}0{% endif %})</span>
+    </a>
+    <a href="#consultations-schedule" class="hero-pill-btn" style="background: transparent; border-color: rgba(255,255,255,0.3);">
+      <i class="fa-solid fa-calendar-check"></i>
+      <span>Consultations</span>
+    </a>
+  </div>
+</div>
+
+<!-- Modern Quick Stats Metrics Row for Counsellor -->
+<div class="metrics-row">
+  <div class="metric-card" style="{% if flagged and flagged|length > 0 %}border-left: 4px solid var(--color-high-risk); box-shadow: 0 8px 24px -4px rgba(220, 38, 38, 0.12);{% endif %}">
+    <div class="metric-icon-box" style="background: rgba(220, 38, 38, 0.12); color: #dc2626;">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <div class="metric-data">
+      <h4>Priority Flags</h4>
+      <div class="metric-val" style="{% if flagged and flagged|length > 0 %}color: #dc2626;{% endif %}">
+        {% if flagged %}{{ flagged|length }}{% else %}0{% endif %} <span style="font-size: 12px; color: var(--color-slate); font-weight: normal;">High Risk</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon-box" style="background: rgba(22, 163, 74, 0.12); color: #15803d;">
+      <i class="fa-solid fa-address-book"></i>
+    </div>
+    <div class="metric-data">
+      <h4>Monitored Students</h4>
+      <div class="metric-val">
+        {{ (regular|length) + (flagged|length if flagged else 0) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon-box" style="background: rgba(37, 99, 235, 0.12); color: #1d4ed8;">
+      <i class="fa-solid fa-calendar-days"></i>
+    </div>
+    <div class="metric-data">
+      <h4>Consultations</h4>
+      <div class="metric-val">
+        {{ sessions|length if sessions else 0 }} <span style="font-size: 12px; color: var(--color-slate); font-weight: normal;">Booked</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.14); color: #b45309;">
+      <i class="fa-solid fa-brain"></i>
+    </div>
+    <div class="metric-data">
+      <h4>AI Model</h4>
+      <div class="metric-val" style="font-size: 14px; color: #15803d;">
+        <i class="fa-solid fa-circle" style="font-size: 8px; vertical-align: middle;"></i> Online (XGBoost)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 1: PRIORITY FLAGGED QUEUE (AI CLASSIFIED) -->
+<div class="card-flat" id="priority-queue" style="border-left: 5px solid var(--color-high-risk);">
+  <div class="card-title">
+    <i class="fa-solid fa-triangle-exclamation" style="color: var(--color-high-risk);"></i> AI Priority Flagged Queue (Sustained High-Risk)
+  </div>
+  <p style="font-size: 13px; color: var(--color-slate); margin-bottom: 16px;">
+    Students below have been classified as <strong>High Risk</strong> by our ML model for <strong>3 or more consecutive days</strong>. Please prioritize outreach.
+  </p>
+  
+  {% if flagged %}
+  <div class="table-responsive">
+    <table class="table-flat">
+      <thead>
+        <tr style="background-color: #f8fafc;">
+          <th style="width: 24%;">Student Name</th>
+          <th style="width: 18%;">Streak High-Risk</th>
+          <th style="width: 28%;">Academic Engagement</th>
+          <th style="width: 12%;">Risk Level</th>
+          <th style="width: 18%;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in flagged %}
+        <tr class="flagged-streak-row">
+          <td><strong>{{ f.user.name }}</strong></td>
+          <td>
+            <span class="badge-priority badge-high">
+              <i class="fa-solid fa-fire"></i> {{ f.consecutive_high_days }} Days
+            </span>
+          </td>
+          <td style="font-size: 12px;">
+            {% if f.faculty_rating %}
+              Submit: <strong style="color: {% if f.faculty_rating.timely_submission == 'Yes' %}var(--color-moss-green){% else %}var(--color-high-risk){% endif %};">{{ f.faculty_rating.timely_submission }}</strong> | 
+              Particip: <strong>{{ f.faculty_rating.classroom_participation }}</strong>
+            {% else %}
+              <span style="color: var(--color-slate);">No rating logged</span>
+            {% endif %}
+          </td>
+          <td><span class="badge-priority badge-high">High</span></td>
+          <td>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn-table btn-table-primary btn-student-details" data-id="{{ f.user.id }}" data-name="{{ f.user.name | e }}">Profile</button>
+              <a href="#chat-section" class="btn-table btn-table-secondary btn-student-chat" data-id="{{ f.user.id }}">Chat</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p style="color: var(--color-slate); text-align: center; padding: 20px; font-weight: 500;">
+    <i class="fa-solid fa-circle-check" style="color: #16a34a; margin-right: 6px;"></i> All students are currently stable. No sustained high-risk streaks detected.
+  </p>
+  {% endif %}
+</div>
+
+<!-- SECTION 2: REGULAR STUDENT DIRECTORY -->
+<div class="card-flat section-gap" id="student-directory">
+  <div class="card-title">
+    <i class="fa-solid fa-address-book" style="color: var(--color-moss-green);"></i> General Student Health Directory
+  </div>
+  {% if regular %}
+  <div class="table-responsive">
+    <table class="table-flat">
+      <thead>
+        <tr>
+          <th>Student Name</th>
+          <th>Age/Year</th>
+          <th>Current Predict</th>
+          <th>Engagement Rating (Faculty)</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in regular %}
+        <tr>
+          <td><strong>{{ r.user.name }}</strong></td>
+          <td>Age {{ r.profile.age }} | Year {{ r.profile.academic_year }}</td>
+          <td>
+            <span class="badge-priority badge-{{ r.latest_risk | lower }}">
+              {{ r.latest_risk }}
+            </span>
+          </td>
+          <td>
+            {% if r.faculty_rating %}
+              Submit: <strong>{{ r.faculty_rating.timely_submission }}</strong> | Particip: <strong>{{ r.faculty_rating.classroom_participation }}</strong>
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn-table btn-table-secondary btn-student-details" data-id="{{ r.user.id }}" data-name="{{ r.user.name | e }}">Profile</button>
+              <a href="#chat-section" class="btn-table btn-table-secondary btn-student-chat" data-id="{{ r.user.id }}">Chat</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p style="color: var(--color-slate); text-align: center; padding: 20px;">No other students registered yet.</p>
+  {% endif %}
+</div>
+
+<!-- SECTION 3: CONSULTATIONS & REPORT WRITING -->
+<div class="card-flat section-gap" id="consultations-schedule">
+  <div class="card-title">
+    <i class="fa-solid fa-calendar-days" style="color: #2563eb;"></i> Consultation Schedule
+  </div>
+  
+  {% if sessions %}
+  <div class="table-responsive">
+    <table class="table-flat">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Date / Time Slot</th>
+          <th>Status</th>
+          <th>Actions &amp; Reports</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in sessions %}
+        <tr>
+          <td><strong>{{ s.student.name }}</strong></td>
+          <td>{{ s.session.date }} at {{ s.session.time }}</td>
+          <td>
+            <span style="font-weight: 600; color: {% if s.session.status == 'Completed' %}var(--color-moss-green){% else %}var(--color-slate){% endif %};">
+              {{ s.session.status }}
+            </span>
+          </td>
+          <td>
+            {% if s.session.status == 'Scheduled' %}
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <a href="{{ s.session.meet_link }}" target="_blank" rel="noopener noreferrer" class="btn-table btn-table-primary">
+                <i class="fa-solid fa-video"></i> Join Call
+              </a>
+              <button type="button" class="btn-table btn-table-secondary" onclick="openReportModal('{{ s.session.id }}', '{{ s.student.name | e }}')">
+                <i class="fa-solid fa-file-pen"></i> Summary
+              </button>
+            </div>
+            {% elif s.session.status == 'Completed' %}
+              {% if s.report %}
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: var(--color-slate); font-size: 12px;">Notes: "{{ s.report.notes[:36] }}..." ({{ s.report.improvement_level }})</span>
+                <button type="button" class="btn-table btn-table-secondary btn-view-report" 
+                  data-student="{{ s.student.name | e }}" 
+                  data-improvement="{{ s.report.improvement_level | e }}" 
+                  data-notes="{{ s.report.notes | e }}">
+                  View Full
+                </button>
+              </div>
+              {% else %}
+              <span style="color: var(--color-slate); font-size: 12px;">No summary report available</span>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p style="color: var(--color-slate); text-align: center; padding: 20px;">No consultation bookings found.</p>
+  {% endif %}
+</div>
+
+<!-- SECTION 4: CHAT / MESSAGING INTERFACE -->
+<div class="chat-section card-flat section-gap" id="chat-section">
+  <div class="card-title">
+    <span style="font-size: 24px;">💬</span> Student Messenger
+  </div>
+  
+  <div style="display: grid; grid-template-columns: 250px 1fr; gap: 24px; margin-top: 16px;">
+    <!-- Active Chats Contacts -->
+    <div class="user-list-bar">
+      {% for cs in chat_students %}
+      <div class="user-item {% if loop.first %}active{% endif %}" data-user-id="{{ cs.id }}" data-user-name="{{ cs.name | e }}">
+        <span>{{ cs.name }}</span>
+        <span style="font-size: 10px; color: var(--color-slate);">Student</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Active Chat History -->
+    <div class="chat-container">
+      <div class="chat-header">
+        <div style="width: 10px; height: 10px; border-radius: 50%; background-color: var(--color-moss-green);"></div>
+        Active Chat: <span id="active-chat-partner">{{ active_chat.name if active_chat else "No Student selected" }}</span>
+      </div>
+      
+      <div class="chat-history" id="chat-history">
+        <p style="color: var(--color-slate); text-align: center; margin-top: 40%;">Select a student in the sidebar contact list to chat.</p>
+      </div>
+
+      <form class="chat-input-area" id="chat-form">
+        <input type="hidden" id="chat-receiver-id" value="{{ active_chat.id if active_chat else '' }}">
+        <input type="text" class="chat-input" id="chat-input" placeholder="Type a message to student..." required {% if not active_chat %}disabled{% endif %}>
+        <button type="submit" class="btn-3d btn-secondary" style="padding: 10px 16px;" {% if not active_chat %}disabled{% endif %}>Send</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 1: DETAILED STUDENT REPORT WIDGET -->
+<div class="modal-overlay" id="details-modal" role="dialog" aria-modal="true" aria-labelledby="details-student-name">
+  <div class="modal-content" style="max-width: 700px;">
+    <span class="modal-close" aria-label="Close modal">&times;</span>
+    <h2 id="details-student-name" style="margin-bottom: 24px; color: var(--color-deep-ink);">Student Summary Profile</h2>
+    
+    <div id="details-content-area" style="max-height: 500px; overflow-y: auto;">
+      <p style="color: var(--color-slate);">Loading student details...</p>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 2: WRITE COUNSELLOR SUMMARY NOTES -->
+<div class="modal-overlay" id="report-modal" role="dialog" aria-modal="true" aria-labelledby="modal-report-title">
+  <div class="modal-content">
+    <span class="modal-close" aria-label="Close modal">&times;</span>
+    <h2 id="modal-report-title" style="margin-bottom: 12px;">Conduct Session Summary</h2>
+    <h3 style="margin-bottom: 16px; font-size: 15px; color: var(--color-slate);">Student: <span id="report-student-name" style="color: var(--color-deep-ink);">Name</span></h3>
+    
+    <form id="report-form" action="" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="report-notes">Clinical / Session Notes</label>
+        <textarea class="form-input" id="report-notes" name="notes" rows="4" placeholder="Enter session diagnosis, details, guidance, coping strategies..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="report-improvement">Improvement Level</label>
+        <select class="form-input" id="report-improvement" name="improvement_level" required>
+          <option value="Significant">Significant Improvement</option>
+          <option value="Moderate">Moderate Improvement</option>
+          <option value="No Change">No Change / Stable</option>
+          <option value="Deterioration">Deterioration (Further Alert Needed)</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-3d btn-primary" style="width: 100%; margin-top: 12px;">Save Session Report</button>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL 3: VIEW COMPLETED REPORT DETAILS (Fix #18) -->
+<div class="modal-overlay" id="view-report-modal" role="dialog" aria-modal="true" aria-labelledby="view-report-title">
+  <div class="modal-content">
+    <span class="modal-close" aria-label="Close modal">&times;</span>
+    <h2 id="view-report-title" style="margin-bottom: 12px;">Consultation Report Details</h2>
+    <p style="font-size: 14px; margin-bottom: 8px;"><strong>Student:</strong> <span id="view-report-student" style="color: var(--color-deep-ink);"></span></p>
+    <p style="font-size: 14px; margin-bottom: 16px;"><strong>Improvement Status:</strong> <span id="view-report-improvement" style="font-weight: 600; color: var(--color-moss-green);"></span></p>
+    <div style="background: var(--color-canvas); border: 1px solid var(--color-deep-ink); border-radius: var(--radius-cards); padding: 16px; margin-bottom: 20px;">
+      <h4 style="margin-bottom: 8px; font-size: 13px; color: var(--color-slate); text-transform: uppercase;">Clinical / Observation Notes:</h4>
+      <p id="view-report-notes" style="font-size: 14px; line-height: 1.6; white-space: pre-wrap; color: var(--color-deep-ink);"></p>
+    </div>
+    <button type="button" class="btn-3d btn-ghost" onclick="document.getElementById('view-report-modal').style.display='none'" style="width: 100%;">Close</button>
+  </div>
+</div>
+
+<script>
+  // Event delegation to avoid inline quotes syntax breaking (Fix #14)
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".btn-student-details").forEach(btn => {
+      btn.addEventListener("click", () => {
+        viewStudentDetails(btn.dataset.id, btn.dataset.name);
+      });
+    });
+
+    document.querySelectorAll(".btn-student-chat").forEach(btn => {
+      btn.addEventListener("click", () => {
+        openChatWith(btn.dataset.id);
+      });
+    });
+
+    document.querySelectorAll(".btn-view-report").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const modal = document.getElementById("view-report-modal");
+        document.getElementById("view-report-student").textContent = btn.dataset.student;
+        document.getElementById("view-report-improvement").textContent = btn.dataset.improvement;
+        document.getElementById("view-report-notes").textContent = btn.dataset.notes;
+        modal.style.display = "flex";
+      });
+    });
+  });
+
+  function openReportModal(sessionId, studentName) {
+    const modal = document.getElementById("report-modal");
+    const nameSpan = document.getElementById("report-student-name");
+    const form = document.getElementById("report-form");
+    const notesArea = document.getElementById("report-notes");
+
+    nameSpan.textContent = studentName;
+    if (notesArea) notesArea.value = "";
+    form.action = `/counsellor/report/${sessionId}`;
+    modal.style.display = "flex";
+  }
+
+  function openChatWith(studentId) {
+    const listItems = document.querySelectorAll(".user-item");
+    listItems.forEach(item => {
+      if (item.dataset.userId === String(studentId)) {
+        item.click();
+      }
+    });
+  }
+
+  function viewStudentDetails(studentId, name) {
+    const modal = document.getElementById("details-modal");
+    const nameSpan = document.getElementById("details-student-name");
+    const content = document.getElementById("details-content-area");
+
+    nameSpan.textContent = `${name}'s Summary Profile`;
+    content.innerHTML = "<p style='color: var(--color-slate);'>Fetching latest data from database...</p>";
+    modal.style.display = "flex";
+
+    // Fetch student summary data dynamically from backend JSON
+    fetch(`/counsellor/student/details/${studentId}`)
+      .then(res => res.json())
+      .then(data => {
+         if (data.status !== "success") {
+             content.innerHTML = `<p style="color: var(--color-high-risk)">Failed to load data: ${window.escapeHtml(data.message || 'Unknown error')}</p>`;
+             return;
+         }
+         
+         const p = data.profile || {};
+         const r = data.rating || {};
+         const checkins = data.checkins || [];
+         
+         // Safe HTML injection preventing Stored XSS (Fix #6)
+         let ratingHtml = '';
+         if (Object.keys(r).length > 0) {
+             ratingHtml = `
+               <p><strong>Timely Submissions:</strong> ${window.escapeHtml(r.timely_submission)}</p>
+               <p><strong>Classroom Participation:</strong> ${window.escapeHtml(r.classroom_participation)}</p>
+               <p><strong>Faculty Observations:</strong> "${window.escapeHtml(r.notes || 'None logged')}"</p>
+             `;
+         } else {
+             ratingHtml = `<p style="color: var(--color-slate)">No faculty rating logged yet.</p>`;
+         }
+         
+         let checkinsHtml = '';
+         if (checkins.length > 0) {
+             checkinsHtml = `
+               <div class="table-responsive">
+                 <table class="table-flat" style="font-size: 12px; width: 100%;">
+                   <thead>
+                     <tr>
+                       <th>Date</th>
+                       <th>Daily Sleep</th>
+                       <th>Daily Study</th>
+                       <th>Pressure</th>
+                       <th>Mood</th>
+                       <th>AI Predicted Risk</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+                     ${checkins.map(c => `
+                       <tr>
+                         <td>${window.escapeHtml(c.date)}</td>
+                         <td>${window.escapeHtml(c.sleep_hours)} hrs</td>
+                         <td>${window.escapeHtml(c.study_hours)} hrs</td>
+                         <td>${window.escapeHtml(c.exam_pressure)}/10</td>
+                         <td>${window.escapeHtml(c.mood_score)}/10</td>
+                         <td><span class="badge-priority badge-${window.escapeHtml(c.predicted_risk.toLowerCase())}">${window.escapeHtml(c.predicted_risk)}</span></td>
+                       </tr>
+                     `).join('')}
+                   </tbody>
+                 </table>
+               </div>
+             `;
+         } else {
+             checkinsHtml = `<p style="color: var(--color-slate)">No check-in logs recorded yet.</p>`;
+         }
+         
+         // Genuine calculated sleep average (Fix #22)
+         const sleepDisplay = data.avg_sleep !== "N/A" ? `${data.avg_sleep} hrs/night (avg)` : "N/A";
+
+         content.innerHTML = `
+           <div style="margin-bottom: 24px;">
+             <h4 style="border-bottom: 1.5px solid var(--color-deep-ink); padding-bottom: 8px; margin-bottom: 12px;">Baseline Survey Profile</h4>
+             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px;">
+               <p><strong>Recent Sleep Average:</strong> ${window.escapeHtml(sleepDisplay)}</p>
+               <p><strong>Physical Activity:</strong> ${window.escapeHtml(p.physical_activity !== undefined ? p.physical_activity : 'N/A')} hrs/day</p>
+               <p><strong>Anxiety Score:</strong> ${window.escapeHtml(p.anxiety_score !== undefined ? p.anxiety_score : 'N/A')} / 10</p>
+               <p><strong>Depression Score:</strong> ${window.escapeHtml(p.depression_score !== undefined ? p.depression_score : 'N/A')} / 10</p>
+               <p><strong>Burnout Score:</strong> ${window.escapeHtml(p.burnout_score !== undefined ? p.burnout_score : 'N/A')} / 10</p>
+               <p><strong>Mental Health Index:</strong> ${window.escapeHtml(p.mental_health_index !== undefined ? p.mental_health_index : 'N/A')} / 10</p>
+               <p><strong>Financial Stress:</strong> ${window.escapeHtml(p.financial_stress !== undefined ? p.financial_stress : 'N/A')} / 10</p>
+               <p><strong>Family Expectations:</strong> ${window.escapeHtml(p.family_expectation !== undefined ? p.family_expectation : 'N/A')} / 10</p>
+             </div>
+           </div>
+
+           <div style="margin-bottom: 24px;">
+             <h4 style="border-bottom: 1.5px solid var(--color-deep-ink); padding-bottom: 8px; margin-bottom: 12px;">Faculty Engagement Insights</h4>
+             <div style="background-color: var(--color-canvas); padding: 12px; border-radius: var(--radius-cards); font-size: 13px; border: 1px solid var(--color-deep-ink);">
+               ${ratingHtml}
+             </div>
+           </div>
+
+           <div>
+             <h4 style="border-bottom: 1.5px solid var(--color-deep-ink); padding-bottom: 8px; margin-bottom: 12px;">Check-in Logs Trend</h4>
+             <p style="font-size: 12px; color: var(--color-slate); margin-bottom: 8px;">Latest daily updates recorded by student:</p>
+             ${checkinsHtml}
+           </div>
+         `;
+      })
+      .catch(err => {
+         content.innerHTML = `<p style="color: var(--color-high-risk)">Error loading student details: ${window.escapeHtml(err)}</p>`;
+      });
+  }
+</script>
+{% endblock %}

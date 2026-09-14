@@ -1,0 +1,246 @@
+{% extends "layout.html" %}
+
+{% block title %}MindGarden - Faculty Dashboard{% endblock %}
+
+{% block content %}
+<div class="hero-card">
+  <div>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+      <span style="background: rgba(89, 226, 93, 0.2); color: var(--color-moss-green); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Faculty Portal</span>
+      <span style="color: rgba(255,255,255,0.7); font-size: 13px;">Academic Mentorship</span>
+    </div>
+    <h1>Faculty Dashboard</h1>
+    <p style="color: #e2e8f0; font-size: 14px;">
+      Welcome, <strong>{{ user.name }}</strong>. Monitor student academic engagement, assignment submission consistency, and record observational feedback.
+    </p>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
+    <a href="#student-directory" class="hero-pill-btn">
+      <i class="fa-solid fa-graduation-cap"></i>
+      <span>Active Students</span>
+    </a>
+    <a href="#weekly-summary" class="hero-pill-btn" style="background: transparent; border-color: rgba(255,255,255,0.3);">
+      <i class="fa-solid fa-chart-simple"></i>
+      <span>Weekly Report</span>
+    </a>
+  </div>
+</div>
+
+<!-- Modern Quick Stats Metrics Row for Faculty -->
+<div class="metrics-row">
+  <div class="metric-card">
+    <div class="metric-icon-box" style="background: rgba(22, 163, 74, 0.12); color: #15803d;">
+      <i class="fa-solid fa-users"></i>
+    </div>
+    <div class="metric-data">
+      <h4>Enrolled Students</h4>
+      <div class="metric-val">
+        {{ students | length }}
+      </div>
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.14); color: #b45309;">
+      <i class="fa-solid fa-clipboard-check"></i>
+    </div>
+    <div class="metric-data">
+      <h4>Logged Ratings</h4>
+      <div class="metric-val">
+        {% set rated_count = namespace(value=0) %}
+        {% for s in students %}
+          {% if s.rating %}{% set rated_count.value = rated_count.value + 1 %}{% endif %}
+        {% endfor %}
+        {{ rated_count.value }} <span style="font-size: 12px; color: var(--color-slate); font-weight: normal;">/ {{ students | length }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon-box" style="background: rgba(37, 99, 235, 0.12); color: #1d4ed8;">
+      <i class="fa-solid fa-chart-pie"></i>
+    </div>
+    <div class="metric-data">
+      <h4>Academic Status</h4>
+      <div class="metric-val" style="font-size: 15px; color: #15803d;">
+        <i class="fa-solid fa-circle" style="font-size: 8px; vertical-align: middle;"></i> Active Semester
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Grid: Left student list, Right quick rate form -->
+<div class="faculty-layout-grid">
+  
+  <!-- Left Side: Student List & Previous ratings -->
+  <div>
+    <div class="card-flat" id="student-directory">
+      <div class="card-title">
+        <i class="fa-solid fa-graduation-cap" style="color: var(--color-moss-green);"></i> Active Student Directory
+      </div>
+      <div class="table-responsive">
+        <table class="table-flat">
+          <thead>
+            <tr>
+              <th style="width: 28%;">Name</th>
+              <th style="width: 36%;">Email</th>
+              <th style="width: 16%;">Year</th>
+              <th style="width: 20%;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in students %}
+            <tr>
+              <td><strong>{{ s.user.name }}</strong></td>
+              <td style="color: var(--color-slate); font-size: 12px;">{{ s.user.email }}</td>
+              <td>Year {{ s.profile.academic_year if s.profile else 'N/A' }}</td>
+              <td>
+                <!-- Compact action button -->
+                <button type="button" class="btn-table btn-table-primary select-rate-btn"
+                  data-student-id="{{ s.user.id }}"
+                  data-student-name="{{ s.user.name | e }}"
+                  data-timely="{{ s.rating.timely_submission if s.rating else 'Yes' }}"
+                  data-participation="{{ s.rating.classroom_participation if s.rating else 'Medium' }}"
+                  data-notes="{{ s.rating.notes | e if s.rating and s.rating.notes else '' }}">
+                  <i class="fa-solid fa-pen-to-square" style="font-size: 11px;"></i>
+                  <span>{% if s.rating %}Edit{% else %}Rate{% endif %}</span>
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Logging Form & Weekly Summary -->
+  <div>
+    <div class="card-flat" id="rating-card" style="display: none; border: 2px solid var(--color-hi-yellow); box-shadow: 0 12px 28px rgba(19, 14, 48, 0.08);">
+      <div class="card-title" style="justify-content: space-between;">
+        <span><span style="font-size: 24px;">📝</span> Log Ratings for <span id="target-student-name" style="color: var(--color-deep-ink);">Student</span></span>
+        <button type="button" class="btn-3d btn-ghost" onclick="document.getElementById('rating-card').style.display='none'" style="padding: 4px 10px; font-size: 11px;">Cancel</button>
+      </div>
+      
+      <form id="rating-form" action="" method="POST">
+        <div class="form-group">
+          <label class="form-label" for="timely_submission">Timely Assignment Submissions</label>
+          <select class="form-input" id="timely_submission" name="timely_submission" required>
+            <option value="Yes">Yes (Always/Mostly on Time)</option>
+            <option value="No">No (Frequently Late/Missing)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="classroom_participation">Classroom Participation Level</label>
+          <select class="form-input" id="classroom_participation" name="classroom_participation" required>
+            <option value="High">High (Very Active, Asks Questions)</option>
+            <option value="Medium">Medium (Moderately Active)</option>
+            <option value="Low">Low (Quiet, Disengaged)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="notes">Observational Notes</label>
+          <textarea class="form-input" id="notes" name="notes" rows="3" placeholder="Write any academic feedback, missing lectures details, assignment concerns..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-3d btn-secondary" style="width: 100%;">Submit Engagement Record</button>
+      </form>
+    </div>
+
+    <!-- Weekly Summary Report (Privacy Compliant - Academic Metrics Only) -->
+    <div class="card-flat" id="weekly-summary">
+      <div class="card-title">
+        <span style="font-size: 24px;">📅</span> Weekly Academic Engagement Summary
+      </div>
+      <p style="font-size: 12px; color: var(--color-slate); margin-bottom: 12px;">
+        *Privacy Rule: In compliance with university policies, sensitive mental health data, scores, and risk classifications are kept confidential between students and counsellors. Below is the academic-only summary.
+      </p>
+      
+      <div class="table-responsive">
+        <table class="table-flat" style="font-size: 13px;">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Last Rated</th>
+              <th>On-Time Submit</th>
+              <th>Participation</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in students %}
+            <tr>
+              <td><strong>{{ s.user.name }}</strong></td>
+              <td>{{ s.rating.date if s.rating else 'No rating' }}</td>
+              <td>
+                {% if s.rating %}
+                  <!-- Replaced hardcoded hex with CSS variable (Fix #23) -->
+                  <span style="color: {% if s.rating.timely_submission == 'Yes' %}var(--color-moss-green){% else %}var(--color-high-risk){% endif %}; font-weight: bold;">
+                    {{ s.rating.timely_submission }}
+                  </span>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                {% if s.rating %}
+                  <span style="font-weight: bold; color: var(--color-deep-ink);">
+                    {{ s.rating.classroom_participation }}
+                  </span>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".select-rate-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectStudent(
+          btn.dataset.studentId,
+          btn.dataset.studentName,
+          btn.dataset.timely,
+          btn.dataset.participation,
+          btn.dataset.notes
+        );
+      });
+    });
+  });
+
+  // Pre-load existing ratings and remarks into form (Fix #19)
+  function selectStudent(studentId, name, timely, participation, notes) {
+    const card = document.getElementById("rating-card");
+    const nameSpan = document.getElementById("target-student-name");
+    const form = document.getElementById("rating-form");
+    const timelySelect = document.getElementById("timely_submission");
+    const partSelect = document.getElementById("classroom_participation");
+    const notesInput = document.getElementById("notes");
+
+    // Display card
+    card.style.display = "block";
+    nameSpan.textContent = name;
+    
+    // Set form action path dynamically
+    form.action = `/faculty/rate/${studentId}`;
+
+    // Pre-populate values
+    if (timelySelect && timely) timelySelect.value = timely;
+    if (partSelect && participation) partSelect.value = participation;
+    if (notesInput) notesInput.value = notes || "";
+    
+    // Scroll smoothly to form
+    card.scrollIntoView({ behavior: "smooth" });
+  }
+</script>
+{% endblock %}

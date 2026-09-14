@@ -1,0 +1,167 @@
+{% extends "layout.html" %}
+
+{% block title %}MindGarden - Welcome & Authentication{% endblock %}
+
+{% block body_content %}
+<div class="login-body">
+  <!-- Top Brand Header -->
+  <a href="{{ url_for('login') }}" class="login-brand-header">
+    <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="32" cy="32" r="32" fill="var(--color-canvas)" />
+      <path d="M32 48V28" stroke="var(--color-deep-ink)" stroke-width="4" stroke-linecap="round" />
+      <path d="M32 28C32 28 36 20 44 24C44 24 44 32 32 32" fill="var(--color-moss-green)" />
+      <path d="M32 36C32 36 28 28 20 32C20 32 20 40 32 40" fill="var(--color-hi-yellow)" />
+    </svg>
+    <span class="logo-text">MindGarden</span>
+  </a>
+
+  <!-- Error alerts -->
+  {% if error %}
+  <div class="alert-bar" id="error-alert" style="max-width: 780px; width: 95vw; margin-bottom: 16px;">
+    <span>⚠️ {{ error }}</span>
+  </div>
+  {% endif %}
+
+  <!-- Reference Sliding Authentication Card Component -->
+  <div class="card" id="auth-card">
+    <!-- Card Background (Smooth sliding overlay) -->
+    <div class="card-bg {% if tab != 'signup' %}login{% endif %}" id="card-bg"></div>
+
+    <!-- Hero Panel for Register view (visible on left when Register is active) -->
+    <div class="hero register {% if tab == 'signup' %}active{% endif %}" id="hero-register">
+      <h2>Welcome back</h2>
+      <p>Already tracking your wellness with MindGarden? Sign in to review your analytics and connect with mentors.</p>
+      <button type="button" onclick="toggleAuthView('login')">LOGIN</button>
+    </div>
+
+    <!-- Register Form (positioned right when Register is active) -->
+    <div class="form register {% if tab == 'signup' %}active{% endif %}" id="form-register">
+      <h2>Sign Up</h2>
+      <div class="sso">
+        <a class="fa-brands fa-google" title="Google Campus SSO" href="javascript:void(0)"></a>
+        <a class="fa-brands fa-microsoft" title="Campus Microsoft 365" href="javascript:void(0)"></a>
+        <a class="fa-brands fa-linkedin" title="LinkedIn Student ID" href="javascript:void(0)"></a>
+      </div>
+      <p class="form-subtitle">Or use your college email address</p>
+      <form id="signup-form" action="{{ url_for('signup') }}" method="POST" onsubmit="return validateSignup(event)">
+        <input class="form-input" type="text" id="signup-name" name="name" placeholder="Full name" autocomplete="name" required>
+        <input class="form-input" type="email" id="signup-email" name="email" placeholder="College email (.edu domain)"
+          autocomplete="email" pattern=".+@.+\.edu$" title="Must be a valid .edu college email" required>
+        
+        <select class="form-input" id="signup-role" name="role" required>
+          <option value="student">Account Role: Student</option>
+          <option value="faculty">Account Role: Faculty Member</option>
+          <option value="counsellor">Account Role: Campus Counsellor</option>
+        </select>
+
+        <div style="position: relative; display: flex; align-items: center; width: 100%;">
+          <input class="form-input" type="password" id="signup-password" name="password" minlength="6" placeholder="Create password (min 6 chars)" autocomplete="new-password" required style="padding-right: 42px;">
+          <button type="button" class="toggle-password-btn" data-target-input="signup-password" title="Show/hide password" style="position: absolute; right: 14px; background: none; border: none; cursor: pointer; color: var(--color-slate); font-size: 14px;"><i class="fa-solid fa-eye"></i></button>
+        </div>
+
+        <div style="position: relative; display: flex; align-items: center; width: 100%;">
+          <input class="form-input" type="password" id="signup-confirm-password" name="confirm_password" minlength="6" placeholder="Confirm password" autocomplete="new-password" required style="padding-right: 42px;">
+          <button type="button" class="toggle-password-btn" data-target-input="signup-confirm-password" title="Show/hide password" style="position: absolute; right: 14px; background: none; border: none; cursor: pointer; color: var(--color-slate); font-size: 14px;"><i class="fa-solid fa-eye"></i></button>
+        </div>
+
+        <button type="submit" class="auth-submit-btn">SIGN UP</button>
+      </form>
+    </div>
+
+    <!-- Hero Panel for Login view (visible on right when Login is active) -->
+    <div class="hero login {% if tab != 'signup' %}active{% endif %}" id="hero-login">
+      <h2>Hello there</h2>
+      <p>Begin your wellness journey with MindGarden. Track daily stress, monitor burnout indicators, and thrive.</p>
+      <button type="button" onclick="toggleAuthView('register')">SIGN UP</button>
+    </div>
+
+    <!-- Login Form (positioned left when Login is active) -->
+    <div class="form login {% if tab != 'signup' %}active{% endif %}" id="form-login">
+      <h2>Login</h2>
+      <div class="sso">
+        <a class="fa-brands fa-google" title="Google Campus SSO" href="javascript:void(0)"></a>
+        <a class="fa-brands fa-microsoft" title="Campus Microsoft 365" href="javascript:void(0)"></a>
+        <a class="fa-brands fa-linkedin" title="LinkedIn Student ID" href="javascript:void(0)"></a>
+      </div>
+      <p class="form-subtitle">Or use your college email address</p>
+      <form id="login-form" action="{{ url_for('login') }}" method="POST">
+        <input class="form-input" type="email" id="login-email" name="email" placeholder="Email (student@college.edu)" autocomplete="email" required>
+        
+        <div style="position: relative; display: flex; align-items: center; width: 100%;">
+          <input class="form-input" type="password" id="login-password" name="password" placeholder="Password" autocomplete="current-password" required style="padding-right: 42px;">
+          <button type="button" class="toggle-password-btn" data-target-input="login-password" title="Show/hide password" style="position: absolute; right: 14px; background: none; border: none; cursor: pointer; color: var(--color-slate); font-size: 14px;"><i class="fa-solid fa-eye"></i></button>
+        </div>
+
+        <select class="form-input" id="login-role" name="role">
+          <option value="">Auto-detect Role</option>
+          <option value="student">Student</option>
+          <option value="faculty">Faculty Member</option>
+          <option value="counsellor">Campus Counsellor</option>
+        </select>
+
+        <a href="javascript:void(0)" onclick="window.showToast('Password recovery notice dispatched to your college email.', 'info')" class="forgot-link">Forgot password?</a>
+
+        <button type="submit" class="auth-submit-btn">LOGIN</button>
+      </form>
+
+      <!-- 1-Click Fast Filler Demo Buttons -->
+      <div class="demo-fillers-row">
+        <p>🚀 1-Click Demo Accounts:</p>
+        <div class="demo-btn-group">
+          <button type="button" class="demo-fill-btn" title="Alex (Student)"
+            data-autofill-email="student@college.edu" data-autofill-pass="student123" data-autofill-role="student">
+            🌱 Alex
+          </button>
+          <button type="button" class="demo-fill-btn" title="Prof. Vance (Faculty)"
+            data-autofill-email="faculty@college.edu" data-autofill-pass="faculty123" data-autofill-role="faculty">
+            📚 Vance
+          </button>
+          <button type="button" class="demo-fill-btn" title="Dr. Sarah (Counsellor)"
+            data-autofill-email="counsellor@college.edu" data-autofill-pass="counsellor123" data-autofill-role="counsellor">
+            🩺 Sarah
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleAuthView(targetView) {
+    const cardBg = document.getElementById("card-bg");
+    const heroRegister = document.getElementById("hero-register");
+    const formRegister = document.getElementById("form-register");
+    const heroLogin = document.getElementById("hero-login");
+    const formLogin = document.getElementById("form-login");
+    const errorAlert = document.getElementById("error-alert");
+
+    if (errorAlert) errorAlert.style.display = "none";
+
+    if (targetView === "login") {
+      cardBg.classList.add("login");
+      heroLogin.classList.add("active");
+      formLogin.classList.add("active");
+      heroRegister.classList.remove("active");
+      formRegister.classList.remove("active");
+    } else {
+      cardBg.classList.remove("login");
+      heroLogin.classList.remove("active");
+      formLogin.classList.remove("active");
+      heroRegister.classList.add("active");
+      formRegister.classList.add("active");
+    }
+  }
+
+  function validateSignup(event) {
+    const pwd = document.getElementById("signup-password").value;
+    const confirm = document.getElementById("signup-confirm-password").value;
+
+    if (pwd !== confirm) {
+      event.preventDefault();
+      window.showToast("Passwords do not match. Please verify.", "error");
+      return false;
+    }
+    return true;
+  }
+</script>
+{% endblock %}

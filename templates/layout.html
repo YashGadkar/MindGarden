@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MindGarden{% endblock %}</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="MindGarden - Tracking student mental health and academic stress with predictive AI support.">
+  
+  <!-- Favicon SVG Data URI (Fix #23) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%2359e25d'/%3E%3Cpath d='M32 48V28' stroke='%23130e30' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M32 28C32 28 36 20 44 24C44 24 44 32 32 32' fill='%23130e30'/%3E%3Ccircle cx='40' cy='22' r='4' fill='%23ffe228'/%3E%3C/svg%3E">
+
+  <!-- Chart.js CDN for visual analytics (Fix #11) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Font Awesome Icons for SSO & Dashboard Badges -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <!-- Toast Notification Container (Fix #12) -->
+  <div class="toast-container" id="toast-container" aria-live="polite">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="toast-item toast-{{ category }}">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span>{% if category == 'success' %}✅{% elif category == 'error' %}⚠️{% else %}ℹ️{% endif %}</span>
+              <span>{{ message }}</span>
+            </div>
+            <button type="button" class="toast-close" onclick="this.closest('.toast-item').remove()" aria-label="Close notification">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  {% block body_content %}
+  <!-- Mobile Navigation Header (Fix #8) -->
+  <header class="mobile-topbar">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <svg class="logo-icon" style="width: 28px; height: 28px;" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="32" cy="32" r="32" fill="var(--color-canvas)"/>
+        <path d="M32 48V28" stroke="var(--color-deep-ink)" stroke-width="4" stroke-linecap="round"/>
+        <path d="M32 28C32 28 36 20 44 24C44 24 44 32 32 32" fill="var(--color-moss-green)"/>
+        <path d="M32 36C32 36 28 28 20 32C20 32 20 40 32 40" fill="var(--color-hi-yellow)"/>
+      </svg>
+      <span class="logo-text" style="font-size: 20px;">MindGarden</span>
+    </div>
+    <button type="button" class="hamburger-btn" id="hamburger-btn" aria-label="Toggle navigation menu">
+      <span>☰ Menu</span>
+    </button>
+  </header>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <div class="app-container">
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar">
+      <div class="logo-container">
+        <!-- Sprout icon SVG representing MindGarden logo -->
+        <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="32" cy="32" r="32" fill="var(--color-canvas)"/>
+          <path d="M32 48V28" stroke="var(--color-deep-ink)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M32 28C32 28 36 20 44 24C44 24 44 32 32 32" fill="var(--color-moss-green)"/>
+          <path d="M32 36C32 36 28 28 20 32C20 32 20 40 32 40" fill="var(--color-hi-yellow)"/>
+        </svg>
+        <span class="logo-text">MindGarden</span>
+      </div>
+      
+      <!-- Role-Aware Context Navigation -->
+      <ul class="nav-links">
+        <li class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">
+          <a href="{{ url_for('index') }}">
+            <i class="fa-solid fa-house" style="width: 20px; margin-right: 10px;"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        {% if session.get('role') == 'student' %}
+        <li class="nav-item">
+          <a href="#checkin-card">
+            <i class="fa-solid fa-clipboard-check" style="width: 20px; margin-right: 10px;"></i>
+            <span>Daily Check-in</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#consultations-card">
+            <i class="fa-solid fa-calendar-days" style="width: 20px; margin-right: 10px;"></i>
+            <span>Consultations</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#chat-section">
+            <i class="fa-solid fa-comment-dots" style="width: 20px; margin-right: 10px;"></i>
+            <span>Counsellor Chat</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#profile-section">
+            <i class="fa-solid fa-sliders" style="width: 20px; margin-right: 10px;"></i>
+            <span>Profile Settings</span>
+          </a>
+        </li>
+        {% elif session.get('role') == 'counsellor' %}
+        <li class="nav-item">
+          <a href="#priority-queue">
+            <i class="fa-solid fa-triangle-exclamation" style="width: 20px; margin-right: 10px;"></i>
+            <span>Priority Flags</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#student-directory">
+            <i class="fa-solid fa-address-book" style="width: 20px; margin-right: 10px;"></i>
+            <span>Student Directory</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#consultations-schedule">
+            <i class="fa-solid fa-calendar-check" style="width: 20px; margin-right: 10px;"></i>
+            <span>Schedule</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#chat-section">
+            <i class="fa-solid fa-comments" style="width: 20px; margin-right: 10px;"></i>
+            <span>Messenger</span>
+          </a>
+        </li>
+        {% elif session.get('role') == 'faculty' %}
+        <li class="nav-item">
+          <a href="#student-directory">
+            <i class="fa-solid fa-graduation-cap" style="width: 20px; margin-right: 10px;"></i>
+            <span>Active Students</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#rating-card">
+            <i class="fa-solid fa-pen-to-square" style="width: 20px; margin-right: 10px;"></i>
+            <span>Log Ratings</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#weekly-summary">
+            <i class="fa-solid fa-chart-simple" style="width: 20px; margin-right: 10px;"></i>
+            <span>Weekly Summary</span>
+          </a>
+        </li>
+        {% endif %}
+
+        <li class="nav-item-logout nav-item">
+          <a href="{{ url_for('logout') }}" style="border: 1px solid var(--color-high-risk); color: var(--color-high-risk);">
+            <i class="fa-solid fa-arrow-right-from-bracket" style="width: 20px; margin-right: 10px;"></i>
+            <span>Log Out</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Canvas -->
+    <main class="main-content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  {% endblock %}
+
+  <!-- Core JavaScript -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
