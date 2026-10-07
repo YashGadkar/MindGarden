@@ -1,0 +1,3 @@
+Campus mental health shouldn't wait for a crisis.
+
+We built MindGarden — a Community Engineering Project combining 18-feature XGBoost predictive modeling with the human-centered "Ditto" design system to connect students, faculty mentors, and campus counsellors before vulnerability turns into emergency.

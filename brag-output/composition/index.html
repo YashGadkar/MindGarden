@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>MindGarden — Launch Video</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,500;0,700;1,600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+
+    <style>
+      :root {
+        --color-deep-ink: #0f172a;
+        --color-hi-yellow: #b45309;
+        --color-moss-green: #15803d;
+        --color-canvas: #f8faf5;
+        --color-soft-meadow: #edf2e8;
+        --color-charcoal: #1e293b;
+        --color-slate: #334155;
+        --color-slate-light: #475569;
+        --color-paper: #ffffff;
+        --color-border-subtle: rgba(15, 23, 42, 0.08);
+        --color-border-medium: rgba(15, 23, 42, 0.16);
+        --color-low-risk: #15803d;
+        --color-low-risk-bg: #dcfce7;
+        --color-high-risk: #b91c1c;
+        --color-high-risk-bg: #fee2e2;
+
+        --font-display: 'EB Garamond', Georgia, Cambria, serif;
+        --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+
+        --radius-cards: 24px;
+        --radius-pill: 1440px;
+        --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.04);
+        --shadow-elevated: 0 24px 60px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(15, 23, 42, 0.06);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #0f172a;
+        font-family: var(--font-ui);
+        color: var(--color-deep-ink);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+
+      /* Base clip container */
+      .clip {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1920px;
+        height: 1080px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Subtle ambient glow */
+      .ambient-glow {
+        position: absolute;
+        width: 1000px;
+        height: 1000px;
+        border-radius: 50%;
+        filter: blur(140px);
+        pointer-events: none;
+        opacity: 0.15;
+      }
+
+      /* Badges & Chips */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        border-radius: var(--radius-pill);
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .badge-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+      }
+
+      .badge-brand {
+        background: #dcfce7;
+        color: #14532d;
+        border: 1px solid #bbf7d0;
+      }
+
+      .badge-pill-amber {
+        background: #fef3c7;
+        color: #78350f;
+        border: 1px solid #fde68a;
+      }
+
+      .pill-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 28px;
+        border-radius: var(--radius-pill);
+        background: var(--color-moss-green);
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 16px;
+        box-shadow: 0 8px 20px rgba(21, 128, 61, 0.25);
+      }
+
+      /* ============================================================
+         SCENE 1: The Dilemma & The Paradigm Shift (0.0s – 4.5s)
+         ============================================================ */
+      #scene-1 {
+        background: radial-gradient(circle at 50% 40%, #1e293b 0%, #0f172a 100%);
+        color: #f8fafc;
+        text-align: center;
+        flex-direction: column;
+        padding: 0 160px;
+        z-index: 10;
+      }
+
+      .s1-dilemma-box {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .s1-headline {
+        font-family: var(--font-display);
+        font-size: 68px;
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+        color: #ffffff;
+        max-width: 1400px;
+        margin-top: 24px;
+        margin-bottom: 24px;
+      }
+
+      .s1-subtext {
+        font-size: 24px;
+        color: #cbd5e1;
+        font-weight: 400;
+        max-width: 900px;
+        line-height: 1.5;
+      }
+
+      .s1-solution-box {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        opacity: 0;
+      }
+
+      .s1-brand-title {
+        font-family: var(--font-display);
+        font-size: 84px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-top: 16px;
+        margin-bottom: 16px;
+        letter-spacing: -0.01em;
+      }
+
+      .s1-brand-tagline {
+        font-size: 28px;
+        color: #bbf7d0;
+        font-weight: 600;
+        max-width: 1000px;
+        line-height: 1.4;
+      }
+
+      /* ============================================================
+         SCENE 2: The Student Experience & Tactile Sliders (4.5s – 9.5s)
+         ============================================================ */
+      #scene-2 {
+        background-color: var(--color-canvas);
+        z-index: 20;
+        padding: 80px 120px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .s2-container {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1.05fr;
+        gap: 60px;
+        align-items: center;
+      }
+
+      .s2-left {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .s2-section-title {
+        font-family: var(--font-display);
+        font-size: 46px;
+        font-weight: 700;
+        color: var(--color-deep-ink);
+        line-height: 1.2;
+      }
+
+      .s2-section-desc {
+        font-size: 20px;
+        color: var(--color-slate);
+        line-height: 1.5;
+      }
+
+      .s2-card {
+        background: var(--color-paper);
+        border: 1.5px solid var(--color-border-subtle);
+        border-radius: var(--radius-cards);
+        box-shadow: var(--shadow-elevated);
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+      }
+
+      .card-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1.5px solid var(--color-border-subtle);
+        padding-bottom: 18px;
+      }
+
+      .card-title {
+        font-family: var(--font-display);
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--color-deep-ink);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      /* Tactile Sliders */
+      .slider-row {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .slider-label-bar {
+        display: flex;
+        justify-content: space-between;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--color-deep-ink);
+      }
+
+      .slider-value-pill {
+        color: var(--color-moss-green);
+        font-weight: 700;
+        font-size: 16px;
+      }
+
+      .slider-track {
+        height: 10px;
+        border-radius: 999px;
+        background: var(--color-soft-meadow);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .slider-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #15803d, #22c55e);
+        border-radius: 999px;
+        width: 30%;
+      }
+
+      .s2-right-metrics {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .metric-badge-card {
+        background: var(--color-paper);
+        border: 1.5px solid var(--color-border-subtle);
+        border-radius: 20px;
+        box-shadow: var(--shadow-soft);
+        padding: 24px 32px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+
+      .metric-avatar {
+        width: 68px;
+        height: 68px;
+        border-radius: 16px;
+        background: #f0fdf4;
+        color: var(--color-moss-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+      }
+
+      .metric-info h4 {
+        font-size: 15px;
+        color: #475569;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        margin-bottom: 6px;
+      }
+
+      .metric-info .metric-large {
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--color-deep-ink);
+      }
+
+      .s2-ui-preview {
+        border-radius: 16px;
+        overflow: hidden;
+        border: 2px solid var(--color-border-subtle);
+        box-shadow: var(--shadow-soft);
+        height: 220px;
+      }
+
+      .s2-ui-preview img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        object-position: top;
+      }
+
+      /* ============================================================
+         SCENE 3: XGBoost Inference & Counsellor Queue (9.5s – 15.0s)
+         ============================================================ */
+      #scene-3 {
+        background-color: #f1f5f9;
+        z-index: 30;
+        padding: 70px 120px;
+        flex-direction: column;
+        justify-content: center;
+        gap: 40px;
+      }
+
+      .s3-top-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      .s3-header-text {
+        font-family: var(--font-display);
+        font-size: 42px;
+        font-weight: 700;
+        color: var(--color-deep-ink);
+      }
+
+      .chips-row {
+        display: flex;
+        gap: 12px;
+        margin-top: 10px;
+      }
+
+      .chip-item {
+        background: #ffffff;
+        border: 1px solid #94a3b8;
+        padding: 8px 16px;
+        border-radius: 100px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      .s3-content-grid {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 40px;
+        align-items: center;
+      }
+
+      .xgboost-engine-card {
+        background: #ffffff;
+        border-radius: var(--radius-cards);
+        border: 1.5px solid var(--color-border-subtle);
+        box-shadow: var(--shadow-elevated);
+        padding: 36px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .engine-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: #92400e;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .engine-main {
+        font-family: var(--font-display);
+        font-size: 30px;
+        font-weight: 700;
+        color: var(--color-deep-ink);
+        line-height: 1.3;
+      }
+
+      .prob-bar-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      .prob-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      .prob-track {
+        flex: 1;
+        margin: 0 16px;
+        height: 12px;
+        background: #cbd5e1;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .prob-fill-high {
+        width: 78%;
+        height: 100%;
+        background: #b91c1c;
+        border-radius: 999px;
+      }
+
+      .counsellor-alert-card {
+        background: #ffffff;
+        border: 2px solid #f87171;
+        border-radius: var(--radius-cards);
+        box-shadow: var(--shadow-elevated);
+        padding: 36px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        position: relative;
+      }
+
+      .alert-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .alert-badge {
+        background: #fee2e2;
+        color: #991b1b;
+        font-weight: 800;
+        font-size: 15px;
+        padding: 6px 16px;
+        border-radius: 100px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .alert-details {
+        font-size: 18px;
+        color: #1e293b;
+        line-height: 1.5;
+      }
+
+      .alert-action-btn {
+        background: #b91c1c;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 16px;
+        padding: 14px 28px;
+        border-radius: var(--radius-pill);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 6px 18px rgba(185, 28, 28, 0.3);
+      }
+
+      /* ============================================================
+         SCENE 4: The Triad & Outro (15.0s – 20.0s)
+         ============================================================ */
+      #scene-4 {
+        background: radial-gradient(circle at 50% 40%, #0f172a 0%, #020617 100%);
+        color: #ffffff;
+        z-index: 40;
+        padding: 80px 140px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+
+      .s4-triad-row {
+        display: flex;
+        gap: 32px;
+        margin-bottom: 48px;
+      }
+
+      .triad-card {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        padding: 24px 36px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: #ffffff;
+        font-size: 20px;
+        font-weight: 600;
+      }
+
+      .triad-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+      }
+
+      .triad-icon-green {
+        background: rgba(34, 197, 94, 0.25);
+        color: #86efac;
+      }
+
+      .triad-icon-amber {
+        background: rgba(245, 158, 11, 0.25);
+        color: #fde047;
+      }
+
+      .triad-icon-blue {
+        background: rgba(59, 130, 246, 0.25);
+        color: #93c5fd;
+      }
+
+      .s4-claim {
+        font-size: 32px;
+        color: #e2e8f0;
+        font-weight: 500;
+        margin-bottom: 24px;
+        letter-spacing: 0.02em;
+      }
+
+      .s4-brand-emblem {
+        font-family: var(--font-display);
+        font-size: 92px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: #ffffff;
+        margin-bottom: 12px;
+      }
+
+      .s4-subtitle {
+        font-size: 26px;
+        color: #86efac;
+        font-weight: 600;
+        margin-bottom: 28px;
+      }
+
+      .s4-footer-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 28px;
+        border-radius: var(--radius-pill);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #cbd5e1;
+        font-size: 16px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Composition Container -->
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="20"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Audio Elements -->
+      <audio
+        id="bg-music"
+        data-start="0"
+        data-duration="20"
+        data-track-index="10"
+        data-volume="0.32"
+        data-fade-out="1.2"
+        src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"
+      ></audio>
+
+      <!-- SFX Cues (exact trimmed media durations) -->
+      <audio
+        id="sfx-reveal"
+        data-start="2.3"
+        data-duration="0.11"
+        data-track-index="11"
+        data-volume="0.70"
+        src="assets/sfx/interface/drop_001.ogg"
+      ></audio>
+
+      <audio
+        id="sfx-slider"
+        data-start="6.2"
+        data-duration="0.01"
+        data-track-index="12"
+        data-volume="0.75"
+        src="assets/sfx/interface/click_002.ogg"
+      ></audio>
+
+      <audio
+        id="sfx-bell"
+        data-start="11.4"
+        data-duration="1.48"
+        data-track-index="13"
+        data-volume="0.75"
+        src="assets/sfx/impact/impactBell_heavy_000.ogg"
+      ></audio>
+
+      <audio
+        id="sfx-outro"
+        data-start="16.5"
+        data-duration="0.12"
+        data-track-index="14"
+        data-volume="0.80"
+        src="assets/sfx/interface/bong_001.ogg"
+      ></audio>
+
+      <!-- ============================================================
+           SCENE 1: The Dilemma & The Paradigm Shift (0.0s – 4.5s)
+           ============================================================ -->
+      <div id="scene-1" class="clip" data-start="0" data-duration="4.5" data-track-index="0">
+        <div class="ambient-glow" style="background: #38bdf8; top: 10%; left: 20%;"></div>
+
+        <!-- Beat 1: The Problem -->
+        <div class="s1-dilemma-box" id="s1-dilemma">
+          <div class="badge badge-danger">Collegiate Mental Health Challenge</div>
+          <h1 class="s1-headline">Campus mental health shouldn't wait for a crisis.</h1>
+          <p class="s1-subtext">
+            Traditional systems react only after acute crisis hits. MindGarden bridges students, faculty, and counsellors through early predictive intelligence.
+          </p>
+        </div>
+
+        <!-- Beat 2: The Solution -->
+        <div class="s1-solution-box" id="s1-solution">
+          <div class="badge badge-brand">Community Engineering Project</div>
+          <div class="s1-brand-title">🌱 MindGarden</div>
+          <p class="s1-brand-tagline">
+            An Intelligent, Multi-Stakeholder Collegiate Wellness Ecosystem
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           SCENE 2: The Student Experience & Tactile Sliders (4.5s – 9.5s)
+           ============================================================ -->
+      <div id="scene-2" class="clip" data-start="4.5" data-duration="5.0" data-track-index="1">
+        <div class="ambient-glow" style="background: #f59e0b; top: 20%; right: 10%;"></div>
+
+        <div class="s2-container">
+          <!-- Left Column: Interactive Check-in Card -->
+          <div class="s2-left">
+            <div class="badge badge-pill-amber">The "Ditto" Design System</div>
+            <h2 class="s2-section-title">Human-Centered Daily Check-ins</h2>
+            <p class="s2-section-desc">
+              Warm, stigma-free tracking of sleep habits, academic pressure, and social support.
+            </p>
+
+            <div class="s2-card" id="s2-card">
+              <div class="card-header-row">
+                <div class="card-title">🌱 Daily Habit Check-in</div>
+                <div class="pill-button" style="padding: 6px 16px; font-size: 13px;">Active</div>
+              </div>
+
+              <!-- Slider 1 -->
+              <div class="slider-row">
+                <div class="slider-label-bar">
+                  <span>Sleep Hours Last Night</span>
+                  <span class="slider-value-pill" id="s2-val-sleep">7.5 hrs</span>
+                </div>
+                <div class="slider-track">
+                  <div class="slider-fill" id="s2-fill-sleep" style="width: 72%;"></div>
+                </div>
+              </div>
+
+              <!-- Slider 2 -->
+              <div class="slider-row">
+                <div class="slider-label-bar">
+                  <span>Academic Pressure</span>
+                  <span class="slider-value-pill" id="s2-val-stress" style="color: #b45309;">Moderate (4/10)</span>
+                </div>
+                <div class="slider-track">
+                  <div class="slider-fill" id="s2-fill-stress" style="width: 40%; background: #b45309;"></div>
+                </div>
+              </div>
+
+              <!-- Slider 3 -->
+              <div class="slider-row">
+                <div class="slider-label-bar">
+                  <span>Social Support Level</span>
+                  <span class="slider-value-pill" id="s2-val-social">Strong (8/10)</span>
+                </div>
+                <div class="slider-track">
+                  <div class="slider-fill" id="s2-fill-social" style="width: 80%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Metrics & Dashboard Screen -->
+          <div class="s2-right-metrics" id="s2-right">
+            <div class="metric-badge-card" id="s2-metric-1">
+              <div class="metric-avatar">🌿</div>
+              <div class="metric-info">
+                <h4>Mental Health Index</h4>
+                <div class="metric-large"><span id="s2-counter">7.8</span> <span style="font-size: 18px; color: #475569; font-weight: normal;">/ 10</span></div>
+              </div>
+            </div>
+
+            <div class="metric-badge-card" id="s2-metric-2">
+              <div class="metric-avatar" style="background: #fef3c7; color: #b45309;">🛡️</div>
+              <div class="metric-info">
+                <h4>Dynamic Risk Trajectory</h4>
+                <div class="badge badge-brand" style="margin-top: 4px; font-size: 15px;">Low Vulnerability (Stable)</div>
+              </div>
+            </div>
+
+            <div class="s2-ui-preview" data-layout-allow-overflow>
+              <img src="assets/images/student_dashboard.png" alt="Student Dashboard Screenshot" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           SCENE 3: XGBoost Inference & Counsellor Queue (9.5s – 15.0s)
+           ============================================================ -->
+      <div id="scene-3" class="clip" data-start="9.5" data-duration="5.5" data-track-index="2">
+        <div class="ambient-glow" style="background: #dc2626; bottom: 10%; right: 15%; opacity: 0.12;"></div>
+
+        <div class="s3-top-banner" id="s3-top">
+          <div>
+            <div class="badge badge-brand">Clinical Triage Engine</div>
+            <h2 class="s3-header-text">18-Feature Psychological Vector &amp; Inference</h2>
+          </div>
+          <div class="chips-row">
+            <span class="chip-item">Sleep Deficit</span>
+            <span class="chip-item">Faculty Observations</span>
+            <span class="chip-item">Screen Time</span>
+            <span class="chip-item">Exam Anxiety</span>
+          </div>
+        </div>
+
+        <div class="s3-content-grid">
+          <!-- XGBoost Analysis Card -->
+          <div class="xgboost-engine-card" id="s3-engine">
+            <div class="engine-title">🤖 XGBoost Gradient Boosted Trees</div>
+            <div class="engine-main">Multi-Class Vulnerability Classification</div>
+            <p style="font-size: 16px; color: var(--color-slate); line-height: 1.4;">
+              Trained on student psychological features to predict risk trajectory with regularized decision trees.
+            </p>
+
+            <div class="prob-bar-container">
+              <div class="prob-row">
+                <span style="color: #b91c1c; font-weight: 700;">High Risk (Flagged)</span>
+                <span style="color: #b91c1c; font-weight: 800;">78%</span>
+              </div>
+              <div class="prob-track">
+                <div class="prob-fill-high" id="s3-prob-fill"></div>
+              </div>
+              <div class="prob-row" style="font-size: 13px; color: #475569; justify-content: space-between;">
+                <span>Moderate Risk: 15%</span>
+                <span>Low Risk: 7%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Counsellor Priority Queue Alert -->
+          <div class="counsellor-alert-card" id="s3-alert">
+            <div class="alert-header">
+              <div class="alert-badge">⚠️ High Priority Intervention</div>
+              <span style="font-family: var(--font-mono); font-size: 14px; color: #475569;">ID: STU-4092</span>
+            </div>
+
+            <div style="font-size: 24px; font-weight: 700; color: var(--color-deep-ink); font-family: var(--font-display);">
+              Academic Disengagement + Sleep Drop Detected
+            </div>
+
+            <p class="alert-details">
+              Faculty observed 3 consecutive assignment delays alongside a 4.2-hour daily sleep deficit.
+            </p>
+
+            <div class="alert-action-btn">
+              <span>🩺 Initiate Confidential Clinical Outreach</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           SCENE 4: The Triad & Outro (15.0s – 20.0s)
+           ============================================================ -->
+      <div id="scene-4" class="clip" data-start="15.0" data-duration="5.0" data-track-index="3">
+        <div class="ambient-glow" style="background: #15803d; top: 30%; left: 30%;"></div>
+
+        <!-- The Stakeholder Triad -->
+        <div class="s4-triad-row" id="s4-triad">
+          <div class="triad-card">
+            <div class="triad-icon triad-icon-green">🌱</div>
+            <div>
+              <div style="font-size: 14px; color: #94a3b8; text-transform: uppercase;">Students</div>
+              <div>Daily Wellness Check-in</div>
+            </div>
+          </div>
+
+          <div class="triad-card">
+            <div class="triad-icon triad-icon-amber">🎓</div>
+            <div>
+              <div style="font-size: 14px; color: #94a3b8; text-transform: uppercase;">Faculty Mentors</div>
+              <div>Academic Observations</div>
+            </div>
+          </div>
+
+          <div class="triad-card">
+            <div class="triad-icon triad-icon-blue">🩺</div>
+            <div>
+              <div style="font-size: 14px; color: #94a3b8; text-transform: uppercase;">Campus Counsellors</div>
+              <div>Priority Clinical Triage</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Punchline & Outro -->
+        <div id="s4-outro">
+          <div class="s4-claim">Early prediction. Empathetic intervention. Zero stigma.</div>
+          <div class="s4-brand-emblem">🌱 MindGarden</div>
+          <div class="s4-subtitle">Collegiate Mental Health Prediction &amp; Support Platform</div>
+
+          <div class="s4-footer-badge">
+            <span>Community Engineering Project (CEP)</span>
+            <span>•</span>
+            <span>Powered by XGBoost, Flask &amp; Ditto Design System</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GSAP Master Animation Timeline -->
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // ==========================================
+      // Scene 1 Animations (0.0s – 4.5s)
+      // ==========================================
+      tl.fromTo(
+        "#s1-dilemma",
+        { opacity: 0, y: 30, scale: 0.98 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power2.out" },
+        0.2
+      );
+
+      // Transition from Dilemma to Solution at 2.2s (beat-locked: 2.19s)
+      tl.to(
+        "#s1-dilemma",
+        { opacity: 0, y: -30, duration: 0.4, ease: "power2.in" },
+        2.1
+      );
+
+      tl.fromTo(
+        "#s1-solution",
+        { opacity: 0, y: 30, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "power2.out" },
+        2.4
+      );
+
+      // ==========================================
+      // Scene 2 Animations (4.5s – 9.5s)
+      // ==========================================
+      tl.fromTo(
+        "#s2-card",
+        { opacity: 0, x: -40, scale: 0.97 },
+        { opacity: 1, x: 0, scale: 1, duration: 0.7, ease: "power2.out" },
+        4.7
+      );
+
+      tl.fromTo(
+        "#s2-right",
+        { opacity: 0, x: 40 },
+        { opacity: 1, x: 0, duration: 0.7, ease: "power2.out" },
+        4.9
+      );
+
+      // Tactile slider scrubbing animation (beat-grid: 6.0s - 7.5s)
+      tl.fromTo(
+        "#s2-fill-sleep",
+        { width: "30%" },
+        { width: "72%", duration: 1.2, ease: "power1.inOut" },
+        5.8
+      );
+
+      tl.fromTo(
+        "#s2-fill-stress",
+        { width: "75%" },
+        { width: "40%", duration: 1.0, ease: "power1.inOut" },
+        6.4
+      );
+
+      // Counter animation
+      const counterObj = { val: 6.2 };
+      tl.to(
+        counterObj,
+        {
+          val: 7.8,
+          duration: 1.2,
+          ease: "power1.out",
+          onUpdate: function () {
+            const el = document.getElementById("s2-counter");
+            if (el) el.innerText = counterObj.val.toFixed(1);
+          },
+        },
+        6.2
+      );
+
+      // ==========================================
+      // Scene 3 Animations (9.5s – 15.0s)
+      // ==========================================
+      tl.fromTo(
+        "#s3-top",
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+        9.7
+      );
+
+      tl.fromTo(
+        "#s3-engine",
+        { opacity: 0, x: -30, scale: 0.98 },
+        { opacity: 1, x: 0, scale: 1, duration: 0.7, ease: "power2.out" },
+        10.0
+      );
+
+      tl.fromTo(
+        "#s3-prob-fill",
+        { width: "10%" },
+        { width: "78%", duration: 1.0, ease: "power2.out" },
+        10.5
+      );
+
+      // Alert card slam (beat-locked: 11.46s)
+      tl.fromTo(
+        "#s3-alert",
+        { opacity: 0, scale: 0.92, y: 30 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(1.5)" },
+        11.4
+      );
+
+      // ==========================================
+      // Scene 4 Animations (15.0s – 20.0s)
+      // ==========================================
+      // Triad staggered entrance (beat-grid: 15.29s, 15.84s, 16.38s)
+      tl.fromTo(
+        ".triad-card",
+        { opacity: 0, y: 30, scale: 0.95 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.25, ease: "power2.out" },
+        15.2
+      );
+
+      // Final Brand & Outro Resolve (beat-locked: 16.93s)
+      tl.fromTo(
+        "#s4-outro",
+        { opacity: 0, scale: 0.94, y: 25 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: "power2.out" },
+        16.8
+      );
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

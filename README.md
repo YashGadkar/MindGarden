@@ -132,6 +132,7 @@ Traditional campus mental health infrastructures suffer from severe structural s
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
+
 │                       TRADITIONAL CAMPUS INFRASTRUCTURE                      │
 │                                                                             │
 │  [Student Suffering] ──(Silence)──> [Crisis Point] ──> [Emergency Center]   │
